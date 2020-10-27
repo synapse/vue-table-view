@@ -4,13 +4,13 @@ export default {
       inserted(el) {
         const nodeClass = el.className;
 
-        if (["table-header"].indexOf(nodeClass) < 0) {
-            return;
+        if (['table-header'].indexOf(nodeClass) < 0) {
+          return;
         }
 
         const table = el.parentElement;
         const thead = table.querySelector('.table-header');
-        const ths = el.querySelectorAll(".table-header-cell-resizable");
+        const ths = el.querySelectorAll('.table-header-cell-resizable');
         const barHeight = thead.offsetHeight;
 
         const resizeContainer = document.createElement('div');
@@ -21,6 +21,8 @@ export default {
 
         let moving = false;
         let movingIndex = 0;
+        let colSize = 0;
+        let colID = '';
 
         ths.forEach((th, index) => {
           th.style.width = th.offsetWidth + 'px';
@@ -29,8 +31,8 @@ export default {
           const nextTh = ths[index];
           const bar = document.createElement('div');
 
-          bar.style.position = "absolute";
-          bar.style.left = (nextTh.offsetLeft + nextTh.offsetWidth - 2) + 'px';
+          bar.style.position = 'absolute';
+          bar.style.left = nextTh.offsetLeft + nextTh.offsetWidth - 2 + 'px';
           bar.style.top = 0;
           bar.style.height = barHeight + 'px';
           bar.style.width = '4px';
@@ -59,8 +61,15 @@ export default {
           bars.forEach((bar, index) => {
             const th = ths[index];
             th.style.width = th.offsetWidth + 'px';
-            bar.style.left = (th.offsetLeft + th.offsetWidth - 2) + 'px';
+            bar.style.left = th.offsetLeft + th.offsetWidth - 2 + 'px';
           });
+
+          const event = new CustomEvent('on-resize', {
+            detail: { size: colSize, id: colID },
+          });
+          el.dispatchEvent(event);
+          colSize = 0;
+          colID = '';
         });
 
         const cutPx = (str) => +str.replace('px', '');
@@ -75,22 +84,35 @@ export default {
             th.style.minWidth = size;
 
             if (columnName) {
-                const cells = table.querySelectorAll("[data-cell='" + columnName + "']");
-                if (cells.length) {
-                    cells.forEach(cell => {
-                        cell.style.width = size;
-                        cell.style.minWidth = size;
-                    });
-                }
+              const cells = table.querySelectorAll(
+                "[data-cell='" + columnName + "']"
+              );
+              if (cells.length) {
+                cells.forEach((cell) => {
+                  cell.style.width = size;
+                  cell.style.minWidth = size;
+                });
+              }
             }
 
-            bar.style.left = (th.offsetLeft + th.offsetWidth - 2) + e.movementX + 'px';
+            bar.style.left =
+              th.offsetLeft + th.offsetWidth - 2 + e.movementX + 'px';
+            colSize = size;
+            colID = columnName;
           }
         };
 
         resizeContainer.addEventListener('mousemove', handleResize);
         table.addEventListener('mousemove', handleResize);
-      }
+      },
+      bind(el, binding, vnode) {
+        el.addEventListener('on-resize', (event) => {
+          if (typeof vnode.context.onResize === 'function' && event.detail) {
+            const { size, id } = event.detail;
+            vnode.context.onResize(id, size);
+          }
+        });
+      },
     });
   },
 };

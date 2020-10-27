@@ -58,6 +58,7 @@ export default {
     onSort: { type: Function, required: false },
     sortCol: { type: String, required: false },
     sortDesc: { type: Boolean, required: false },
+    onResize: { type: Function, required: false },
   },
   components: {
     SortArrow,

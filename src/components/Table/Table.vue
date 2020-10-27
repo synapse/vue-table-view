@@ -6,7 +6,8 @@
           :cols="headers"
           :sort-col="sortByColumn"
           :sort-desc="sortByDesc"
-          :onSort="onSorting"
+          :on-sort="onSorting"
+          :on-resize="onResize"
         >
           <template
             v-for="slot in Object.keys($scopedSlots)"
@@ -77,6 +78,7 @@ export default {
     sortBy: { type: String, required: false, default: null },
     sortDesc: { type: Boolean, required: false, default: false },
     onSort: { type: Function, required: false },
+    onResize: { type: Function, required: false },
     customSort: { type: Object, required: false },
   },
   components: {

@@ -6,6 +6,7 @@
         :items="items"
         :custom-sort="customSorter"
         :loading="loading"
+        :on-resize="onResize"
       >
         <template v-slot:header-priority="{ item }">
           <v-chip color="primary" dark>
@@ -96,7 +97,7 @@ export default {
     };
   },
   methods: {
-    onSort: function (sortBy, sortDesc) {
+    onSort (sortBy, sortDesc) {
       console.log("Sort table externally by:", sortBy, sortDesc);
       this.sortBy = sortBy;
       this.sortDesc = sortDesc;
@@ -118,6 +119,9 @@ export default {
 
       return "none";
     },
+    onResize(id, size) {
+        console.log("Column resized", id, size);
+    }
   },
   computed: {
     customSorter() {
